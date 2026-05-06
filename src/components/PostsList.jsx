@@ -2,42 +2,36 @@ import { useEffect, useState } from "react";
 import "./PostsList.css";
 
 function PostsList() {
-    const posts = []; // TODO: zamień na stan
-    const loading = false; // TODO: zamień na stan
-    const error = ""; // TODO: zamień na stan
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const fetchPosts = async () => {
-        // TODO:
-        // Ustaw loading na true
-
-        // TODO:
-        // Wyczyść poprzedni błąd
+        setLoading(true);
+        setError("");
 
         try {
-            // TODO:
-            // Pobierz dane z API:
-            // https://jsonplaceholder.typicode.com/posts
+            const response = await fetch(
+                "https://jsonplaceholder.typicode.com/posts"
+            );
 
-            // TODO:
-            // Sprawdź, czy odpowiedź jest poprawna
+            if (!response.ok) {
+                throw new Error("Błąd podczas pobierania danych");
+            }
 
-            // TODO:
-            // Sparsuj odpowiedź do JSON
+            const data = await response.json();
 
-            // TODO:
-            // Zapisz tylko 10 pierwszych postów do stanu
+            // tylko pierwsze 10 postów
+            setPosts(data.slice(0, 10));
         } catch (err) {
-            // TODO:
-            // Zapisz błąd do stanu
+            setError(err.message);
         } finally {
-            // TODO:
-            // Zakończ loading
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        // TODO:
-        // Wywołaj funkcję pobierającą dane po załadowaniu komponentu
+        fetchPosts();
     }, []);
 
     return (
@@ -49,7 +43,7 @@ function PostsList() {
                         <p>Pobieranie danych z API w React</p>
                     </div>
 
-                    <button className="reload-btn">
+                    <button className="reload-btn" onClick={fetchPosts}>
                         Pobierz ponownie
                     </button>
                 </div>
@@ -58,20 +52,22 @@ function PostsList() {
                     <p className="info-message">Ładowanie danych...</p>
                 )}
 
-                {/* TODO:
-            Wyświetl komunikat błędu, jeśli wystąpił */}
+                {error && (
+                    <p className="error-message">{error}</p>
+                )}
 
-                {/* TODO:
-            Wyświetl listę postów, jeśli dane zostały pobrane poprawnie */}
-
-                {/* TODO:
-            Użyj map() do wyrenderowania postów */}
-
-                {/* TODO:
-            W każdej karcie pokaż:
-            - id posta
-            - tytuł
-            - treść */}
+                {!loading && !error && (
+                    <div className="posts-list">
+                        {posts.map((post) => (
+                            <div key={post.id} className="post-card">
+                                <h3>
+                                    {post.id}. {post.title}
+                                </h3>
+                                <p>{post.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );
